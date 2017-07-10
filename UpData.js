@@ -48,6 +48,7 @@
         // 准备事件
         $("body").on("change","."+defaults.ModClassName,function () {
 
+            // 获取对象
             console.log($("body ."+defaults.ModClassName)[0].files.length);
 
         })

@@ -4,10 +4,24 @@
 (function ($) {
 
     var defaults = {
-        inputObj : 'ModUploadImgObj',  //input对象,ID名字
-        upDataKey : 'ModUploadObj',    //上传文件对象键值，后台获取文件时需要，必须一致
-        OtherData : {},                //如果同时需要额外传输其他数据时，填写。{"key":0,"key":"val"}(键值,参数),不需要，则为空
-        Server : ''                   //服务端接收路径,传输模式默认为post
+
+        //input对象,ID名字
+        InputObj : 'ModUploadImgObj',
+
+        //DOM类文件类名字
+        ModClassName: 'Mod_UpDataTool',
+
+        //上传文件对象键值，后台获取文件时需要，必须一致
+        UpDataKey : 'ModUploadObj',
+
+        //如果同时需要额外传输其他数据时，填写。{"key":0,"key":"val"}(键值,参数),不需要，则为空
+        OtherData : {},
+
+        //服务端接收路径,传输模式默认为post
+        Server : '',
+
+        // 设置或返回指示文件传输的 MIME 类型的列表（逗号分隔）。 默认选择 图片 类型 ，如需选择其他类型，自行查找正确文件类型，传入参数即可
+        Accept: 'image/png,image/jpeg'
 
     }
 
@@ -16,12 +30,29 @@
         // 上传方法
         Up: function (opt) {
 
-            var options = $.extend(defaults,opt); // 参数覆盖
+            var Options = $.extend(defaults,opt); // 参数覆盖
 
-            console.log(options);
+            //添加对象
+            $("body").append("<input class='"+Options.ModClassName+"' id='"+Options.InputObj+"' type='file' accept='"+Options.Accept+"' multiple='true'>");
+            //激活对象
+            $("body #"+Options.InputObj).click();
+
         }
 
     }
+
+
+    $(function () {
+
+        // 准备事件
+        $("body").on("change","."+defaults.ModClassName,function () {
+
+            console.log($("body ."+defaults.ModClassName)[0].files.length);
+
+        })
+
+    })
+
 
     //  配置数组
     OpenUpdataModSetArray = {};

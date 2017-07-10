@@ -3,7 +3,7 @@
  */
 (function ($) {
 
-    $.UpData = function () {
+    $.UpDataTool = function () {
 
         console.log(1);
 

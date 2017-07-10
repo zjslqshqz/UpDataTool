@@ -1,7 +1,13 @@
 /**
  * Created by cdd on 2017/7/7.
  */
-!(function ($) {
+(function ($) {
+
+    $.UpData = function () {
+
+        console.log(1);
+
+    }
 
     //  配置数组
     OpenUpdataModSetArray = {};
@@ -117,4 +123,4 @@
 //     alert(data);
 // }
 
-})()
+})(jQuery);

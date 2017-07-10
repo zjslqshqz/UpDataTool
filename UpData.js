@@ -3,9 +3,23 @@
  */
 (function ($) {
 
-    $.UpDataTool = function () {
+    var defaults = {
+        inputObj : 'ModUploadImgObj',  //input对象,ID名字
+        upDataKey : 'ModUploadObj',    //上传文件对象键值，后台获取文件时需要，必须一致
+        OtherData : {},                //如果同时需要额外传输其他数据时，填写。{"key":0,"key":"val"}(键值,参数),不需要，则为空
+        Server : ''                   //服务端接收路径,传输模式默认为post
 
-        console.log(1);
+    }
+
+    $.UpDataTool =  {
+
+        // 上传方法
+        Up: function (opt) {
+
+            var options = $.extend(defaults,opt); // 参数覆盖
+
+            console.log(options);
+        }
 
     }
 

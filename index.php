@@ -24,7 +24,15 @@
 
 
     $("#but").click(function () {
-        $.UpDataTool.Up()
+        $.UpDataTool.Up({
+            Accept:"application/pdf",
+            Server:"server.php",
+            callback:function (data) {
+
+                console.log(data);
+
+            }
+        })
     })
 
 </script>

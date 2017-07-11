@@ -3,7 +3,7 @@
  */
 (function ($) {
 
-    var defaults = {
+    var Mod_Defaults = {
 
         //input对象,ID名字
         InputObj : 'ModUploadImgObj',
@@ -85,10 +85,10 @@
     $(function () {
 
         // 准备事件
-        $("body").on("change","."+defaults.ModClassName,function () {
+        $("body").on("change","."+Mod_Defaults.ModClassName,function () {
 
             // 获取对象
-            var dom = $("body ."+defaults.ModClassName)[0].files;
+            var dom = $("body ."+Mod_Defaults.ModClassName)[0].files;
 
             var arr = [];
             $.each(dom,function (i,o) {
@@ -108,13 +108,13 @@
         // 上传方法
         Up: function (opt) {
 
-            defaults = $.extend(defaults,opt); // 参数覆盖
+            Mod_Defaults = $.extend(Mod_Defaults,opt); // 参数覆盖
 
 
             //添加对象
-            $("body").append("<input class='"+defaults.ModClassName+"' id='"+defaults.InputObj+"' type='file' accept='"+defaults.Accept+"' multiple='true'>");
+            $("body").append("<input class='"+Mod_Defaults.ModClassName+"' id='"+Mod_Defaults.InputObj+"' type='file' accept='"+Mod_Defaults.Accept+"' multiple='true'>");
             //激活对象
-            $("body #"+defaults.InputObj).click();
+            $("body #"+Mod_Defaults.InputObj).click();
 
 
 
@@ -128,10 +128,10 @@
 
         // 循环检查
         $.each(FileData,function (i,o) {
-            defaults.callback(o);
+            Mod_Defaults.callback(o);
 
             // 文件类型判断
-            if (defaults.Accept.indexOf(o.type) == '-1'){
+            if (Mod_Defaults.Accept.indexOf(o.type) == '-1'){
 
                 alert('请选择正确的文件类型');
                 return false;
@@ -142,7 +142,7 @@
             var KB = Math.round(o.size * 100 / 1024) / 100;
 
             // 文件大小判断
-            if (o.size > defaults.FileSize){
+            if (o.size > Mod_Defaults.FileSize){
 
                 if (MB > 10) {
                     alert("图片文件不能大于10MB");
@@ -150,8 +150,8 @@
                 return false;
             }
 
-            defaults.callback(MB);
-            defaults.callback(KB);
+            Mod_Defaults.callback(MB);
+            Mod_Defaults.callback(KB);
 
         })
 
@@ -160,16 +160,16 @@
         var fd = new FormData();
 
         //使用[append(键值,对象)]方法添加数据，文件对象
-        fd.append(defaults.UpDataKey, FileData[0]);
+        fd.append(Mod_Defaults.UpDataKey, FileData[0]);
 
         //如果额外需要同时发送其他数据，直接使用[append(键值,对象)]方法添加数据;
 
         //判断是否有额外的内容
-        if (!$.isEmptyObject(defaults.OtherData)){
+        if (!$.isEmptyObject(Mod_Defaults.OtherData)){
             //循环枚举对象。obj对象
-            for(var key in defaults.OtherData){
+            for(var key in Mod_Defaults.OtherData){
                 //添加数据
-                fd.append(key, defaults.OtherData[key]);
+                fd.append(key, Mod_Defaults.OtherData[key]);
             }
         }
 
@@ -179,21 +179,21 @@
         //监听对象声明，绑定事件触发方法
 
         //loadstart,第一次接收到服务反回值时触发
-        xhr.addEventListener("loadstart",defaults.callback_LoadStart,false);
+        xhr.addEventListener("loadstart",Mod_Defaults.callback_LoadStart,false);
 
         //progress,在接收回返值期间，持续周期性触发，计算进度条主要触发对象
-        xhr.upload.addEventListener("progress", defaults.callback_LoadProgress, false);
+        xhr.upload.addEventListener("progress", Mod_Defaults.callback_LoadProgress, false);
 
         //load，接收返回值结束后，触发，完成发送任务
-        xhr.addEventListener("load", defaults.callback_LoadComplete, false);
+        xhr.addEventListener("load", Mod_Defaults.callback_LoadComplete, false);
 
         //error,发生错误时触发
-        xhr.addEventListener("error", defaults.callback_LoadError, false);
+        xhr.addEventListener("error", Mod_Defaults.callback_LoadError, false);
 
         //abort,其他情况
-        xhr.addEventListener("abort", defaults.callback_LoadCanceled, false);
+        xhr.addEventListener("abort", Mod_Defaults.callback_LoadCanceled, false);
         //打开传输通道，接收对象路径
-        xhr.open("POST", defaults.Server);
+        xhr.open("POST", Mod_Defaults.Server);
         //发送数据
         xhr.send(fd);
 

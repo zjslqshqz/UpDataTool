@@ -31,6 +31,11 @@
 
                 console.log(data);
 
+            },
+            callback_FileError:function (data) {
+
+                alert(data);
+
             }
         })
     })

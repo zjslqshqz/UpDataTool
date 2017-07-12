@@ -25,7 +25,13 @@
 
     $("#but").click(function () {
         $.UpDataTool.Up({
-            Accept:"application/pdf",
+            //Accept:"application/pdf",
+
+            OtherData:{
+                a:1,
+                b:2
+            },
+
             Server:"server.php",
             callback:function (data) {
 

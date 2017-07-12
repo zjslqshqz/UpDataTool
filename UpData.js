@@ -5,6 +5,9 @@
 
     var Mod_Defaults = {
 
+        //上传模式 默认 1 ，自动上传 ， 2 ，手动触发
+        SendType : 1,
+
         //input对象,ID名字
         InputObj : 'ModUploadImgObj',
 
@@ -19,6 +22,12 @@
 
         //服务端接收路径,传输模式默认为post
         Server : '',
+
+        //是否允许多选 默认不允许
+        Multiple : false,
+
+        // 本地预览图是否返回
+        LocalPreview : false,
 
         // 设置或返回指示文件传输的 MIME 类型的列表（逗号分隔）。 默认选择 图片 类型 ，如需选择其他类型，自行查找正确文件类型，传入参数即可
         Accept: 'image/png,image/jpeg',
@@ -77,6 +86,12 @@
         callback_LoadCanceled:function (data) {
             console.log('用户已取消上载或浏览器中断连接')
             return data;
+        },
+
+        // 本地预览图 返回
+        callback_LocalPreview:function (data) {
+
+            return data;
         }
 
 
@@ -96,6 +111,7 @@
             if (Mod_Defaults.Accept.indexOf(o.type) == '-1'){
 
                 Mod_Defaults.callback_FileError('请选择正确的文件类型');
+                // 修改状态
                 errInfo = 1;
                 return false;
 
@@ -109,8 +125,11 @@
 
                 if (MB > 10) {
                     alert("图片文件不能大于10MB");
+                    // 修改状态
+                    errInfo = 1;
+                    return false;
                 }
-                return false;
+
             }
 
             Mod_Defaults.callback(MB);
@@ -130,22 +149,41 @@
         for(var key in FileData){
 
             //使用[append(键值,对象)]方法添加数据，文件对象
-            fd.append(Mod_Defaults.UpDataKey, FileData[key]);
+            fd.append(Mod_Defaults.UpDataKey+'_'+key, FileData[key]);
 
         }
 
         //如果额外需要同时发送其他数据，直接使用[append(键值,对象)]方法添加数据;
 
         //判断是否有额外的内容
-        if (!$.isEmptyObject(Mod_Defaults.OtherData)){
+        if (!$.isEmptyObject(Mod_Defaults.OtherData) && !$.isArray(Mod_Defaults.OtherData)){
             //循环枚举对象。obj对象
             for(var key in Mod_Defaults.OtherData){
+                var obj = Mod_Defaults.OtherData[key];
                 //添加数据
-                fd.append(key, Mod_Defaults.OtherData[key]);
+                if ($.isArray(obj) || $.isPlainObject(obj)){
+                    alert("OtherData:参数数据中值不能为数组或对象类型");
+                    return false;
+                }
+                fd.append(key, obj);
             }
         }
 
         //数据准备完毕
+
+        // 检查提交模式
+        if (Mod_Defaults.SendType == 1){
+
+            DataSend_fun(fd);
+
+        }
+
+
+    }
+
+    // 数据提交发送
+    var DataSend_fun = function (data) {
+
         //新建异步提交方法
         var xhr = new XMLHttpRequest();
         //监听对象声明，绑定事件触发方法
@@ -167,7 +205,7 @@
         //打开传输通道，接收对象路径
         xhr.open("POST", Mod_Defaults.Server);
         //发送数据
-        xhr.send(fd);
+        xhr.send(data);
 
 
     }

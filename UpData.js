@@ -11,6 +11,13 @@
         // 绑定选择对象上的事件
         this.on('click',function () {
 
+            var info = $.fn.UpDataTool.TestOptinos(opt);
+            if (info.RS != 1){
+                opt.callback_Error(info);
+                return false;
+            }
+
+
             // 检查是否已经创建文件表单对象
             var dom_file_id = $(this).data("input_id");
 
@@ -65,16 +72,9 @@
                         // 表单选择 绑定事件
                         $("#"+input_id).on('change',function () {
 
-                            // 获取对象
-                            var FilesData = ($.fn.UpDataTool.DataPost_Fun(opt,this.files));
+                            // 执行数据上传动作
+                            $.fn.UpDataTool.LoadPost_fun(opt,this.files);
 
-                            // 数据通过检查
-                            if (FilesData.Info){
-
-                                // 发送数据包
-                                $.fn.UpDataTool.DataSend_fun(opt,FilesData.Data);
-
-                            }
 
                         })
 
@@ -83,23 +83,15 @@
                     // 手动点击上传
                     case 2:
 
-                        // 检查对象是否正确
-                        if (typeof (opt.SendDomObj) == 'string'){
+                        // 绑定点击事件
+                        $(opt.SendDomObj).on("click",function () {
 
-                            // 绑定点击事件
-                            $(opt.SendDomObj).on("click",function () {
-
-
+                            // 执行数据上传动作
+                            $.fn.UpDataTool.LoadPost_fun(opt,$("#"+input_id)[0].files);
 
 
-                            })
+                        })
 
-                        }else {
-
-                            alert("参数:SendDomObj错误");
-                            return false;
-
-                        }
 
                         break ;
                 }
@@ -127,7 +119,7 @@
             // 文件类型判断
             if (Optinos.Accept.indexOf(o.type) == '-1'){
 
-                Optinos.callback_FileError('请选择正确的文件类型');
+                Optinos.callback_Error({RS:-1,Msg:'请选择正确的文件类型'});
                 // 修改状态
                 errInfo = 1;
                 return false;
@@ -141,7 +133,7 @@
             if (o.size > Optinos.FileSize){
 
                 if (MB > 10) {
-                    alert("图片文件不能大于10MB");
+                    Optinos.callback_Error({RS:-1,Msg:'图片文件不能大于10MB'});
                     // 修改状态
                     errInfo = 1;
                     return false;
@@ -178,7 +170,7 @@
                 var obj = Optinos.OtherData[key];
                 //添加数据
                 if ($.isArray(obj) || $.isPlainObject(obj)){
-                    alert("OtherData:参数数据中值不能为数组或对象类型");
+                    Optinos.callback_Error({RS:-1,Msg:'OtherData:参数数据中值不能为数组或对象类型'});
                     return false;
                 }
                 fd.append(key, obj);
@@ -193,42 +185,123 @@
         return infoObj;
 
 
-    }
+    };
 
     // 数据提交发送
     $.fn.UpDataTool.DataSend_fun = function (Optinos,Data) {
+
+        // 开始
+        var LoadStart = function (data) {
+
+            var obj = {};
+            obj.RS = 1;
+            obj.Msg = '开始';
+
+            Optinos.callback_LoadStart(obj);
+
+        }
+
+        // 数据处理
+        var LoadProgress = function (data) {
+
+            var obj = {};
+
+            if (data.lengthComputable) {
+                // 计算数值
+                obj.RS = 1;
+                obj.PercentComplete = Math.round(data.loaded * 100 / data.total);
+            }else {
+                obj.RS = -1;
+                obj.Msg = '无法计算';
+            }
+
+            Optinos.callback_LoadProgress(obj);
+
+        }
+
+        // 完成
+        var LoadComplete = function (data) {
+
+            var obj = {RS:1,Msg:data.target.responseText}
+
+            Optinos.callback_LoadComplete(obj);
+        }
+
+        // 上传发送错误
+        var LoadError = function (data) {
+
+            var obj = {}
+            obj.RS = -1;
+            obj.Msg = '尝试上传文件时出错';
+
+            Optinos.callback_LoadError(obj);
+
+        }
+
+        // 其他情况 取消操作
+        var LoadCanceled = function (data) {
+
+            var obj = {}
+            obj.RS = -1;
+            obj.Msg = '用户已取消上载或浏览器中断连接';
+
+            Optinos.callback_LoadCanceled(obj);
+
+        }
+
 
         //新建异步提交方法
         var xhr = new XMLHttpRequest();
         //监听对象声明，绑定事件触发方法
 
         //loadstart,第一次接收到服务反回值时触发
-        xhr.addEventListener("loadstart",Optinos.callback_LoadStart,false);
+        xhr.addEventListener("loadstart",LoadStart,false);
 
         //progress,在接收回返值期间，持续周期性触发，计算进度条主要触发对象
-        xhr.upload.addEventListener("progress", Optinos.callback_LoadProgress, false);
+        xhr.upload.addEventListener("progress",LoadProgress, false);
 
         //load，接收返回值结束后，触发，完成发送任务
-        xhr.addEventListener("load", Optinos.callback_LoadComplete, false);
+        xhr.addEventListener("load",LoadComplete, false);
 
         //error,发生错误时触发
-        xhr.addEventListener("error", Optinos.callback_LoadError, false);
+        xhr.addEventListener("error",LoadError, false);
 
         //abort,其他情况
-        xhr.addEventListener("abort", Optinos.callback_LoadCanceled, false);
+        xhr.addEventListener("abort",LoadCanceled, false);
         //打开传输通道，接收对象路径
         xhr.open("POST", Optinos.Server);
         //发送数据
         xhr.send(Data);
 
 
-    }
+    };
+
+
+    // 数据检查提交操作
+    $.fn.UpDataTool.LoadPost_fun = function (Optinos,Data) {
+
+        // 获取对象
+        var FilesData = ($.fn.UpDataTool.DataPost_Fun(Optinos,Data));
+
+        // 数据通过检查
+        if (FilesData.Info){
+
+            // 发送数据包
+            $.fn.UpDataTool.DataSend_fun(Optinos,FilesData.Data);
+
+        }
+
+    };
+
 
     // 默认参数
     $.fn.UpDataTool.Mod_Defaults = {
 
         //上传模式 默认 1 ，自动上传 ， 2 ，手动触发
         SendType : 1,
+
+        //提交按钮对象
+        SendDomObj:'',
 
         //input对象,ID名字
         InputObj : 'Mod_UpDataTool',
@@ -257,70 +330,142 @@
         //每个文件的大小限制,默认10mb,单位
         FileSize:1048576,
 
-        // 回调方法
-        callback:function (data) {
-
-            return data;
-
-        },
-
-        //文件错误 回调
-        callback_FileError:function (data) {
-            console.log(data)
-            return data;
+        //通用错误信息
+        callback_Error:function (data) {
+            console.log(data);
         },
 
         //接收到服务器响应后触发
         callback_LoadStart:function (data) {
 
-            console.log('开始')
-            return data;
+            console.log(data);
         },
 
         //接收响应期间持续触发
         callback_LoadProgress:function (data) {
 
-            if (data.lengthComputable) {
-                // 计算数值
-                var percentComplete = Math.round(data.loaded * 100 / data.total);
-                console.log(percentComplete)
-            }else {
-                console.log('无法计算');
-            }
 
-            return data;
+            console.log(data);
         },
 
         //文件上传完毕时，返回服务器信息
         callback_LoadComplete:function (data) {
 
-            console.log(data.target.responseText)
-            return data;
+            console.log(data);
         },
 
         //错误信息
         callback_LoadError:function (data) {
-            console.log('尝试上传文件时出错');
-            return data;
+
+            console.log(data);
         },
 
         //其他
         callback_LoadCanceled:function (data) {
-            console.log('用户已取消上载或浏览器中断连接')
-            return data;
+
+            console.log(data);
         },
 
         // 本地预览图 返回
         callback_LocalPreview:function (data) {
 
-            return data;
-        },
+            console.log(data);
+        }
 
-        //提交按钮对象
-        SendDomObj:''
+
 
 
     };
+
+
+    // 检查参数内容
+    $.fn.UpDataTool.TestOptinos = function (Optinos) {
+
+        // $.each(Optinos,function (i,o) {
+        //
+        //     console.log(o)
+        //
+        // })
+        var obj = {RS:1};
+
+        $.each(Optinos,function (i,o) {
+
+            // 上传模式
+            if (i === 'SendType'){
+                if (Optinos.SendType === 1 || Optinos.SendType === 2){
+
+                }else {
+                    obj.RS = -1;
+                    obj.Msg = '参数[SendType]错误：当前只支持两种模式，int[2]手动触发上传事件，int[1]选择图片后自动触发上传事件';
+
+                }
+            }
+
+
+            // 触发上传事件的对象
+            if (i === 'SendDomObj'){
+                if (Optinos.SendType === 2){
+
+                    // 检查对象是否正确
+                    if (Optinos.SendDomObj !== ''){
+
+                    }else {
+                        obj.RS = -1;
+                        obj.Msg = "参数[SendDomObj]错误：只接受字符类型，如[#id][.className]";
+
+                    }
+                }
+            }
+
+
+            // 服务端路径
+            if (i === 'Server'){
+                if (Optinos.Server === ''){
+                    obj.RS = -1;
+                    obj.Msg = "参数[Server]错误：请输入正确的服务端接受路径";
+                }
+            }
+
+
+            // 是否允许多选
+            if (i === 'Multiple'){
+
+                if (typeof (Optinos.Multiple) === 'boolean'){
+
+                }else {
+
+                    obj.RS = -1;
+                    obj.Msg = "参数[Multiple]错误：请输入正确的类型[true][false]";
+
+                }
+            }
+
+
+            // 本地预览图是否返回
+            if (i === 'LocalPreview'){
+                if (typeof (Optinos.LocalPreview) === 'boolean'){
+
+                }else {
+                    obj.RS = -1;
+                    obj.Msg = "参数[LocalPreview]错误：请输入正确的类型[true][false]";
+                }
+            }
+
+
+            // 每个文件的大小限制
+            if (i === 'FileSize'){
+                if ($.isNumeric(Optinos.FileSize) && Optinos.FileSize > 0){
+
+                }else {
+                    obj.RS = -1;
+                    obj.Msg = "参数[FileSize]错误：请输入正确的类型int[1048576]";
+                }
+            }
+
+        })
+        return obj;
+
+    }
 
 
 

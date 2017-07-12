@@ -37,22 +37,40 @@
 
         Server:"server.php",
 
-        callback:function (data) {
+        callback_Error:function (data) {
+
+            alert(data);
+
+        },
+
+        callback_LoadStart:function (data) {
 
             console.log(data);
 
         },
-        callback_FileError:function (data) {
 
-            alert(data);
+        callback_LoadProgress:function(data){
+
+            console.log(data);
+
+        },
+
+        callback_LoadComplete:function (data) {
+
+            console.log(data);
 
         },
 
         SendDomObj : '#up'
     });
 
-    $("#open1").UpDataTool();
+    $("#open1").UpDataTool({
+        callback_Error:function (data) {
 
+            console.log(data);
+
+        }
+    });
 
 
 </script>

@@ -10,9 +10,9 @@
 
 var_dump(count($_FILES));
 
-foreach ($_FILES as $key => $obj){
-    var_dump($obj);
-}
+//foreach ($_FILES as $key => $obj){
+//    var_dump($obj);
+//}
 
 
 ?>

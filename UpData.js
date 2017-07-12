@@ -3,13 +3,235 @@
  */
 (function ($) {
 
-    var Mod_Defaults = {
+    //主插件对象
+    $.fn.UpDataTool =  function(options){
+
+        var opt = $.fn.extend({},$.fn.UpDataTool.Mod_Defaults,options); // 参数覆盖
+
+        // 绑定选择对象上的事件
+        this.on('click',function () {
+
+            // 检查是否已经创建文件表单对象
+            var dom_file_id = $(this).data("input_id");
+
+            if (dom_file_id){
+
+                // 直接激活已经创建的对象
+                $("#"+dom_file_id).click();
+
+            }else {
+                // 为创建文件表单对象
+
+
+                //检查插件激活次数
+                var Mod_length = $("body").data("UpDataTool_length");
+
+                if (!$.isNumeric(Mod_length)){
+
+                    // 没有数据就初始化为0
+                    Mod_length = 0;
+                    $("body").data("UpDataTool_length",Mod_length);
+
+                }else {
+
+                    // 绑定后增加,并保存
+                    $("body").data("UpDataTool_length",Mod_length++);
+
+                }
+
+
+                //文件表单ID标示
+                var input_id = opt.InputObj+"_"+Mod_length;
+
+                //添加对象
+                $("body").append("<input class='"+opt.ModClassName+"' id='"+input_id+"' type='file' accept='"+opt.Accept+"' multiple='true'>");
+
+
+                // 保存已经新建的文件表单ID
+                $(this).data("input_id",input_id);
+                // 添加class名
+                $(this).addClass("UpDataTool");
+
+                //激活对象
+                $("body #"+input_id).click();
+
+
+                // 根据上传模式 激活上传方式
+                switch (opt.SendType){
+
+                    // 选择完成，自动上传，
+                    case 1:
+
+                        // 表单选择 绑定事件
+                        $("#"+input_id).on('change',function () {
+
+                            // 获取对象
+                            var FilesData = ($.fn.UpDataTool.DataPost_Fun(opt,this.files));
+
+                            // 数据通过检查
+                            if (FilesData.Info){
+
+                                // 发送数据包
+                                $.fn.UpDataTool.DataSend_fun(opt,FilesData.Data);
+
+                            }
+
+                        })
+
+                        break ;
+
+                    // 手动点击上传
+                    case 2:
+
+                        // 检查对象是否正确
+                        if (typeof (opt.SendDomObj) == 'string'){
+
+                            // 绑定点击事件
+                            $(opt.SendDomObj).on("click",function () {
+
+
+
+
+                            })
+
+                        }else {
+
+                            alert("参数:SendDomObj错误");
+                            return false;
+
+                        }
+
+                        break ;
+                }
+
+
+
+            }
+
+        })
+
+
+    };
+
+
+    // 数据准备
+    $.fn.UpDataTool.DataPost_Fun = function (Optinos,FileData) {
+
+        var infoObj = {};
+
+        // 错误状态
+        var errInfo = 0;
+        // 循环检查
+        $.each(FileData,function (i,o) {
+
+            // 文件类型判断
+            if (Optinos.Accept.indexOf(o.type) == '-1'){
+
+                Optinos.callback_FileError('请选择正确的文件类型');
+                // 修改状态
+                errInfo = 1;
+                return false;
+
+            }
+
+            var MB = Math.round(o.size * 100 / (1024 * 1024)) / 100;
+            var KB = Math.round(o.size * 100 / 1024) / 100;
+
+            // 文件大小判断
+            if (o.size > Optinos.FileSize){
+
+                if (MB > 10) {
+                    alert("图片文件不能大于10MB");
+                    // 修改状态
+                    errInfo = 1;
+                    return false;
+                }
+
+            }
+
+
+        })
+
+        // 判断错误信息
+        if (errInfo != 0){
+            infoObj.Info = false;
+            return infoObj;
+        }
+
+        //准备上传数据，新建数据对象
+        var fd = new FormData();
+
+        // 循环添加
+        for(var key in FileData){
+
+            //使用[append(键值,对象)]方法添加数据，文件对象
+            fd.append(Optinos.UpDataKey+'_'+key, FileData[key]);
+
+        }
+
+        //如果额外需要同时发送其他数据，直接使用[append(键值,对象)]方法添加数据;
+
+        //判断是否有额外的内容
+        if (!$.isEmptyObject(Optinos.OtherData) && !$.isArray(Optinos.OtherData)){
+            //循环枚举对象。obj对象
+            for(var key in Optinos.OtherData){
+                var obj = Optinos.OtherData[key];
+                //添加数据
+                if ($.isArray(obj) || $.isPlainObject(obj)){
+                    alert("OtherData:参数数据中值不能为数组或对象类型");
+                    return false;
+                }
+                fd.append(key, obj);
+            }
+        }
+
+        //数据准备完毕
+
+        infoObj.Info = true;
+        infoObj.Data = fd;
+
+        return infoObj;
+
+
+    }
+
+    // 数据提交发送
+    $.fn.UpDataTool.DataSend_fun = function (Optinos,Data) {
+
+        //新建异步提交方法
+        var xhr = new XMLHttpRequest();
+        //监听对象声明，绑定事件触发方法
+
+        //loadstart,第一次接收到服务反回值时触发
+        xhr.addEventListener("loadstart",Optinos.callback_LoadStart,false);
+
+        //progress,在接收回返值期间，持续周期性触发，计算进度条主要触发对象
+        xhr.upload.addEventListener("progress", Optinos.callback_LoadProgress, false);
+
+        //load，接收返回值结束后，触发，完成发送任务
+        xhr.addEventListener("load", Optinos.callback_LoadComplete, false);
+
+        //error,发生错误时触发
+        xhr.addEventListener("error", Optinos.callback_LoadError, false);
+
+        //abort,其他情况
+        xhr.addEventListener("abort", Optinos.callback_LoadCanceled, false);
+        //打开传输通道，接收对象路径
+        xhr.open("POST", Optinos.Server);
+        //发送数据
+        xhr.send(Data);
+
+
+    }
+
+    // 默认参数
+    $.fn.UpDataTool.Mod_Defaults = {
 
         //上传模式 默认 1 ，自动上传 ， 2 ，手动触发
         SendType : 1,
 
         //input对象,ID名字
-        InputObj : 'ModUploadImgObj',
+        InputObj : 'Mod_UpDataTool',
 
         //DOM类文件类名字
         ModClassName: 'Mod_UpDataTool',
@@ -54,7 +276,7 @@
             console.log('开始')
             return data;
         },
-        
+
         //接收响应期间持续触发
         callback_LoadProgress:function (data) {
 
@@ -92,164 +314,14 @@
         callback_LocalPreview:function (data) {
 
             return data;
-        }
+        },
+
+        //提交按钮对象
+        SendDomObj:''
 
 
-    }
+    };
 
 
-    // 数据传输方法
-    var DataPost_Fun = function (FileData) {
-
-        // 错误状态
-        var errInfo = 0;
-        // 循环检查
-        $.each(FileData,function (i,o) {
-            Mod_Defaults.callback(o);
-
-            // 文件类型判断
-            if (Mod_Defaults.Accept.indexOf(o.type) == '-1'){
-
-                Mod_Defaults.callback_FileError('请选择正确的文件类型');
-                // 修改状态
-                errInfo = 1;
-                return false;
-
-            }
-
-            var MB = Math.round(o.size * 100 / (1024 * 1024)) / 100;
-            var KB = Math.round(o.size * 100 / 1024) / 100;
-
-            // 文件大小判断
-            if (o.size > Mod_Defaults.FileSize){
-
-                if (MB > 10) {
-                    alert("图片文件不能大于10MB");
-                    // 修改状态
-                    errInfo = 1;
-                    return false;
-                }
-
-            }
-
-            Mod_Defaults.callback(MB);
-            Mod_Defaults.callback(KB);
-
-        })
-
-        // 判断错误信息
-        if (errInfo != 0){
-            return false
-        }
-
-        //准备上传数据，新建数据对象
-        var fd = new FormData();
-
-        // 循环添加
-        for(var key in FileData){
-
-            //使用[append(键值,对象)]方法添加数据，文件对象
-            fd.append(Mod_Defaults.UpDataKey+'_'+key, FileData[key]);
-
-        }
-
-        //如果额外需要同时发送其他数据，直接使用[append(键值,对象)]方法添加数据;
-
-        //判断是否有额外的内容
-        if (!$.isEmptyObject(Mod_Defaults.OtherData) && !$.isArray(Mod_Defaults.OtherData)){
-            //循环枚举对象。obj对象
-            for(var key in Mod_Defaults.OtherData){
-                var obj = Mod_Defaults.OtherData[key];
-                //添加数据
-                if ($.isArray(obj) || $.isPlainObject(obj)){
-                    alert("OtherData:参数数据中值不能为数组或对象类型");
-                    return false;
-                }
-                fd.append(key, obj);
-            }
-        }
-
-        //数据准备完毕
-
-        // 检查提交模式
-        if (Mod_Defaults.SendType == 1){
-
-            DataSend_fun(fd);
-
-        }
-
-
-    }
-
-    // 数据提交发送
-    var DataSend_fun = function (data) {
-
-        //新建异步提交方法
-        var xhr = new XMLHttpRequest();
-        //监听对象声明，绑定事件触发方法
-
-        //loadstart,第一次接收到服务反回值时触发
-        xhr.addEventListener("loadstart",Mod_Defaults.callback_LoadStart,false);
-
-        //progress,在接收回返值期间，持续周期性触发，计算进度条主要触发对象
-        xhr.upload.addEventListener("progress", Mod_Defaults.callback_LoadProgress, false);
-
-        //load，接收返回值结束后，触发，完成发送任务
-        xhr.addEventListener("load", Mod_Defaults.callback_LoadComplete, false);
-
-        //error,发生错误时触发
-        xhr.addEventListener("error", Mod_Defaults.callback_LoadError, false);
-
-        //abort,其他情况
-        xhr.addEventListener("abort", Mod_Defaults.callback_LoadCanceled, false);
-        //打开传输通道，接收对象路径
-        xhr.open("POST", Mod_Defaults.Server);
-        //发送数据
-        xhr.send(data);
-
-
-    }
-
-
-    $(function () {
-
-        // 准备事件
-        $("body").on("change","."+Mod_Defaults.ModClassName,function () {
-
-            // 获取对象
-            var dom = $("body ."+Mod_Defaults.ModClassName)[0].files;
-
-            var arr = [];
-            $.each(dom,function (i,o) {
-
-                arr.push(o);
-
-            });
-            DataPost_Fun(arr);
-
-        })
-
-    })
-
-    //主插件对象
-    $.UpDataTool =  {
-
-        // 上传方法
-        Up: function (opt) {
-
-            Mod_Defaults = $.extend(Mod_Defaults,opt); // 参数覆盖
-
-
-            //添加对象
-            $("body").append("<input class='"+Mod_Defaults.ModClassName+"' id='"+Mod_Defaults.InputObj+"' type='file' accept='"+Mod_Defaults.Accept+"' multiple='true'>");
-            //激活对象
-            $("body #"+Mod_Defaults.InputObj).click();
-
-
-
-        }
-
-
-    }
 
 })(jQuery);

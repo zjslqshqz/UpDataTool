@@ -18,33 +18,42 @@
     <script type="text/javascript" src="UpData.js"></script>
 </head>
 <body>
-<input type="button" id="but" value="按钮">
+<input type="button" id="open" value="选择">
+<input type="button" id="up" value="上传">
+<input type="button" id="open1" value="选择2">
+<input type="button" id="up1" value="上传2">
 
 <script type="text/javascript">
 
+    $("#open").UpDataTool({
+        Accept:"application/pdf",
 
-    $("#but").click(function () {
-        $.UpDataTool.Up({
-            //Accept:"application/pdf",
+        OtherData:{
+            a:1,
+            b:2
+        },
 
-            OtherData:{
-                a:1,
-                b:2
-            },
+        SendType:2,
 
-            Server:"server.php",
-            callback:function (data) {
+        Server:"server.php",
 
-                console.log(data);
+        callback:function (data) {
 
-            },
-            callback_FileError:function (data) {
+            console.log(data);
 
-                alert(data);
+        },
+        callback_FileError:function (data) {
 
-            }
-        })
-    })
+            alert(data);
+
+        },
+
+        SendDomObj : '#up'
+    });
+
+    $("#open1").UpDataTool();
+
+
 
 </script>
 </body>

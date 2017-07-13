@@ -65,7 +65,8 @@
 
 ```js
     var Option = {
-
+        
+        //==================常用参数
         //上传模式 默认 1 ，自动上传 ， 2 ，手动触发
         SendType : 1,
 
@@ -75,6 +76,22 @@
         //服务端接收路径,传输模式默认为post ,必须参数
         Server : '',
          
+        //如果同时需要额外传输其他数据时，填写。{"key":0,"key":"val"}(键值,参数),不需要，则为空
+        OtherData : {},
+                 
+         
+        //是否允许多选 默认不允许
+        Multiple : false,
+                 
+
+        // 本地预览图是否返回
+        LocalPreview : false,
+                 
+
+        // 设置或返回指示文件传输的 MIME 类型的列表（逗号分隔）。 默认选择 图片 类型 ，如需选择其他类型，自行查找正确文件类型，传入参数即可
+        Accept: 'image/png,image/jpeg',
+                 
+        //====================
 
         //input对象,ID名字  【默认参数即可，不推荐修改】
         InputObj : 'Mod_UpDataTool',  
@@ -90,26 +107,11 @@
         UpDataKey : 'Mod_UpDataTool_file',
         
 
-        //如果同时需要额外传输其他数据时，填写。{"key":0,"key":"val"}(键值,参数),不需要，则为空
-        OtherData : {},
-        
-
-        //是否允许多选 默认不允许
-        Multiple : false,
-        
-
-        // 本地预览图是否返回
-        LocalPreview : false,
-        
-
-        // 设置或返回指示文件传输的 MIME 类型的列表（逗号分隔）。 默认选择 图片 类型 ，如需选择其他类型，自行查找正确文件类型，传入参数即可
-        Accept: 'image/png,image/jpeg',
-        
 
         //每个文件的大小限制,默认10mb,单位
         FileSize:1048576,
         
-
+        //========================回调参数
         //通用错误信息
         callback_Error:function (data) {
             console.log(data);
@@ -157,7 +159,7 @@
 
             console.log(data);
         }
-
+        //========================
 
     };
 ```

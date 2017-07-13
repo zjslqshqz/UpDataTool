@@ -1,6 +1,4 @@
-# UpDataTool 
-
-## 插件说明
+# UpDataTool 插件说明
 
 >纯HTML5 JS 文件上传工具，理论上支持所有文件格式
 

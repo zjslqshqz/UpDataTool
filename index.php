@@ -15,7 +15,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <script type="text/javascript" src="jquery-3.2.1.slim.min.js"></script>
-    <script type="text/javascript" src="UpData.js"></script>
+    <script type="text/javascript" src="UpDataTool.min.js"></script>
 </head>
 <body>
 <input type="button" id="open" value="选择">

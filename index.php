@@ -26,7 +26,7 @@
 <script type="text/javascript">
 
     $("#open").UpDataTool({
-        Accept:"application/pdf",
+        //Accept:"application/pdf",
 
         OtherData:{
             a:1,
@@ -37,9 +37,11 @@
 
         Server:"server.php",
 
+        LocalPreview:true,
+
         callback_Error:function (data) {
 
-            alert(data);
+            console.log(data);
 
         },
 
@@ -67,7 +69,7 @@
     $("#open1").UpDataTool({
         callback_Error:function (data) {
 
-            console.log(data);
+            console.log(data.Msg);
 
         }
     });

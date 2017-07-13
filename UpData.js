@@ -11,6 +11,7 @@
         // 绑定选择对象上的事件
         this.on('click',function () {
 
+            // 参数检查
             var info = $.fn.UpDataTool.TestOptinos(opt);
             if (info.RS != 1){
                 opt.callback_Error(info);
@@ -76,7 +77,7 @@
                             $.fn.UpDataTool.LoadPost_fun(opt,this.files);
 
 
-                        })
+                        });
 
                         break ;
 
@@ -90,7 +91,41 @@
                             $.fn.UpDataTool.LoadPost_fun(opt,$("#"+input_id)[0].files);
 
 
-                        })
+                        });
+
+
+                        // 检查本地预览功能状态
+                        if (opt.LocalPreview){
+
+                            // 判断是否文件是否为 png jpg
+                            if (opt.Accept.indexOf('png') > -1 || opt.Accept.indexOf('jpeg') > -1 ){
+
+                                // 表单选择 绑定事件
+                                $("#"+input_id).on('change',function () {
+
+                                    // 执行数据上传动作
+                                    var data = this.files;
+                                    $.each(data,function (i,o) {
+
+                                        var reader = new FileReader();
+                                        reader.readAsDataURL(o); // file 文件路径
+                                        reader.onload = function(e){
+                                            // 加载完成后返回地址
+                                            opt.callback_LocalPreview({RS:1,Msg:this.result});
+                                        }
+
+                                    });
+
+                                });
+
+                            }else {
+
+                                opt.callback_Error({RS:-1,Msg:'本地预览功能，当前只支持图片[png][jpg]格式'});
+
+                            }
+
+
+                        }
 
 
                         break ;
@@ -169,10 +204,6 @@
             for(var key in Optinos.OtherData){
                 var obj = Optinos.OtherData[key];
                 //添加数据
-                if ($.isArray(obj) || $.isPlainObject(obj)){
-                    Optinos.callback_Error({RS:-1,Msg:'OtherData:参数数据中值不能为数组或对象类型'});
-                    return false;
-                }
                 fd.append(key, obj);
             }
         }
@@ -381,18 +412,13 @@
     // 检查参数内容
     $.fn.UpDataTool.TestOptinos = function (Optinos) {
 
-        // $.each(Optinos,function (i,o) {
-        //
-        //     console.log(o)
-        //
-        // })
         var obj = {RS:1};
 
         $.each(Optinos,function (i,o) {
 
             // 上传模式
             if (i === 'SendType'){
-                if (Optinos.SendType === 1 || Optinos.SendType === 2){
+                if (o === 1 || o === 2){
 
                 }else {
                     obj.RS = -1;
@@ -404,7 +430,7 @@
 
             // 触发上传事件的对象
             if (i === 'SendDomObj'){
-                if (Optinos.SendType === 2){
+                if (o === 2){
 
                     // 检查对象是否正确
                     if (Optinos.SendDomObj !== ''){
@@ -420,7 +446,7 @@
 
             // 服务端路径
             if (i === 'Server'){
-                if (Optinos.Server === ''){
+                if (o === ''){
                     obj.RS = -1;
                     obj.Msg = "参数[Server]错误：请输入正确的服务端接受路径";
                 }
@@ -430,7 +456,7 @@
             // 是否允许多选
             if (i === 'Multiple'){
 
-                if (typeof (Optinos.Multiple) === 'boolean'){
+                if (typeof (o) === 'boolean'){
 
                 }else {
 
@@ -443,24 +469,51 @@
 
             // 本地预览图是否返回
             if (i === 'LocalPreview'){
-                if (typeof (Optinos.LocalPreview) === 'boolean'){
+
+                if (Optinos.SendType === 2){
+
+                    if (typeof (o) === 'boolean'){
+
+                    }else {
+                        obj.RS = -1;
+                        obj.Msg = "参数[LocalPreview]错误：请输入正确的类型[true][false]";
+                    }
 
                 }else {
+
                     obj.RS = -1;
-                    obj.Msg = "参数[LocalPreview]错误：请输入正确的类型[true][false]";
+                    obj.Msg = "参数[LocalPreview]错误：本地预览功能，只在手动上传模式下开启，请设置参数[SendType]为[2]";
+
                 }
+
+
             }
 
 
             // 每个文件的大小限制
             if (i === 'FileSize'){
-                if ($.isNumeric(Optinos.FileSize) && Optinos.FileSize > 0){
+                if ($.isNumeric(o) && o > 0){
 
                 }else {
                     obj.RS = -1;
                     obj.Msg = "参数[FileSize]错误：请输入正确的类型int[1048576]";
                 }
             }
+
+            //其他数据
+            if (i === 'OtherData'){
+
+                for(var key in o){
+
+                    if ($.isArray(o[key]) || $.isPlainObject(o[key])){
+                        obj.RS = -1;
+                        obj.Msg = 'OtherData:参数数据中值不能为数组或对象类型';
+                    }
+
+                }
+
+            }
+
 
         })
         return obj;

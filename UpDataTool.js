@@ -55,8 +55,14 @@
                 //文件表单ID标示
                 var input_id = opt.InputObj+"_"+Mod_length;
 
+
+                // 是否允许多选
+                var m = "";
+                if (opt.Multiple){
+                    m = "multiple='true'";
+                }
                 //添加对象
-                $("body").append("<input class='"+opt.ModClassName+"' id='"+input_id+"' type='file' accept='"+opt.Accept+"' multiple='true'>");
+                $("body").append("<input class='"+opt.ModClassName+"' id='"+input_id+"' type='file' accept='"+opt.Accept+"' "+m+">");
 
 
                 // 保存已经新建的文件表单ID
@@ -482,8 +488,6 @@
 
             console.log(data);
         }
-
-
 
 
     };

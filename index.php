@@ -21,23 +21,19 @@
 <input type="button" id="open" value="选择">
 <input type="button" id="up" value="上传">
 <input type="button" id="open1" value="选择2">
-<input type="button" id="up1" value="上传2">
 
 <script type="text/javascript">
 
     $("#open").UpDataTool({
-        //Accept:"application/pdf",
+        Accept:"application/pdf",
 
         OtherData:{
-            a:1,
-            b:2
+            a:1
         },
 
         SendType:2,
 
         Server:"server.php",
-
-        LocalPreview:true,
 
         callback_Error:function (data) {
 
@@ -67,6 +63,9 @@
     });
 
     $("#open1").UpDataTool({
+
+        Server:"server.php",
+
         callback_Error:function (data) {
 
             console.log(data.Msg);

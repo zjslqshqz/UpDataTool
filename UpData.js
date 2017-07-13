@@ -22,14 +22,13 @@
             // 检查是否已经创建文件表单对象
             var dom_file_id = $(this).data("input_id");
 
-            if (dom_file_id){
+            if (typeof (dom_file_id) !== 'undefined' && dom_file_id !== ''){
 
                 // 直接激活已经创建的对象
                 $("#"+dom_file_id).click();
 
             }else {
                 // 为创建文件表单对象
-
 
                 //检查插件激活次数
                 var Mod_length = $("body").data("UpDataTool_length");
@@ -60,8 +59,11 @@
                 // 添加class名
                 $(this).addClass("UpDataTool");
 
-                //激活对象
+                //激活 filsInput对象
                 $("body #"+input_id).click();
+
+                // 绑定对象传输
+                var ThisDomData = $(this);
 
 
                 // 根据上传模式 激活上传方式
@@ -74,7 +76,7 @@
                         $("#"+input_id).on('change',function () {
 
                             // 执行数据上传动作
-                            $.fn.UpDataTool.LoadPost_fun(opt,this.files);
+                            $.fn.UpDataTool.LoadPost_fun(opt,this.files,ThisDomData);
 
 
                         });
@@ -85,11 +87,15 @@
                     case 2:
 
                         // 绑定点击事件
+                        $(opt.SendDomObj).off("click");
                         $(opt.SendDomObj).on("click",function () {
 
                             // 执行数据上传动作
-                            $.fn.UpDataTool.LoadPost_fun(opt,$("#"+input_id)[0].files);
-
+                            if ($("#"+input_id).length != 0){
+                                $.fn.UpDataTool.LoadPost_fun(opt,$("#"+input_id)[0].files,ThisDomData);
+                            }else {
+                                opt.callback_LocalPreview({RS:-1,Msg:'请先选择需要上传的文件'});
+                            }
 
                         });
 
@@ -189,12 +195,9 @@
         var fd = new FormData();
 
         // 循环添加
-        for(var key in FileData){
-
-            //使用[append(键值,对象)]方法添加数据，文件对象
-            fd.append(Optinos.UpDataKey+'_'+key, FileData[key]);
-
-        }
+        $.each(FileData,function (i,o) {
+            fd.append(Optinos.UpDataKey+'_'+i, o);
+        });
 
         //如果额外需要同时发送其他数据，直接使用[append(键值,对象)]方法添加数据;
 
@@ -206,6 +209,7 @@
                 //添加数据
                 fd.append(key, obj);
             }
+
         }
 
         //数据准备完毕
@@ -219,10 +223,13 @@
     };
 
     // 数据提交发送
-    $.fn.UpDataTool.DataSend_fun = function (Optinos,Data) {
+    $.fn.UpDataTool.DataSend_fun = function (Optinos,Data,DomData) {
 
         // 开始
         var LoadStart = function (data) {
+
+            $("body").append($.fn.UpDataTool.LoadProgressHTML());
+            $("#"+Optinos.ModClassName+"_LoadProgress").show();
 
             var obj = {};
             obj.RS = 1;
@@ -232,7 +239,8 @@
 
         }
 
-        // 数据处理
+
+        // 数据处理中
         var LoadProgress = function (data) {
 
             var obj = {};
@@ -246,6 +254,8 @@
                 obj.Msg = '无法计算';
             }
 
+            $("#"+Optinos.ModClassName+"_LoadProgress").css('width',obj.PercentComplete+"%");
+
             Optinos.callback_LoadProgress(obj);
 
         }
@@ -253,9 +263,27 @@
         // 完成
         var LoadComplete = function (data) {
 
-            var obj = {RS:1,Msg:data.target.responseText}
+            // 修改绑定对象相关信息
+            // 从对象获取数 fileInput dom ID
+            $("#"+DomData.data("input_id")).remove();
+            ///
+            //  清空 fileInput dom ID
+            DomData.data("input_id",'');
+            // 删除绑定对象上的class
+            DomData.removeClass("UpDataTool");
+            // 修改插件数量
+            var l = $("body").data("UpDataTool_length");
+            if (l == 0){
+                $("body").data("UpDataTool_length",'');
+            }else {
+                $("body").data("UpDataTool_length",l--);
+            }
+            /// 删除 上传进度块
+            $("#"+Optinos.ModClassName+"_LoadProgressHTML_Back").remove();
+            $("#"+Optinos.ModClassName+"_LoadProgressHTML").remove();
+            ///
 
-            Optinos.callback_LoadComplete(obj);
+            Optinos.callback_LoadComplete(data.target.responseText);
         }
 
         // 上传发送错误
@@ -309,7 +337,7 @@
 
 
     // 数据检查提交操作
-    $.fn.UpDataTool.LoadPost_fun = function (Optinos,Data) {
+    $.fn.UpDataTool.LoadPost_fun = function (Optinos,Data,DomData) {
 
         // 获取对象
         var FilesData = ($.fn.UpDataTool.DataPost_Fun(Optinos,Data));
@@ -318,9 +346,30 @@
         if (FilesData.Info){
 
             // 发送数据包
-            $.fn.UpDataTool.DataSend_fun(Optinos,FilesData.Data);
+            $.fn.UpDataTool.DataSend_fun(Optinos,FilesData.Data,DomData);
 
         }
+
+    };
+
+    // 加载条件HTML
+    $.fn.UpDataTool.LoadProgressHTML = function () {
+
+        var html  = '<Div id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML_Back" style="position: fixed; left:0; top: 0; opacity: 0.7; background-color: #fff; width: 100%; height: 100%; z-index: 9;"></Div>' +
+            '<DIV class="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadHTMLBox" id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML" style=" position: fixed; z-index: 10; top: 30%; left: 25%; z-index: 10; width: 700px; border:2px solid #00a6a6; border-radius: 5px; background-color: #ffffff;">' +
+            '<div class="titel" style="width: 90%; padding: 0 5%; line-height: 60px; border-bottom: 1px solid #e7e7e7; font-size: 14px; color: #010101;">上传文件中 </div> ' +
+            '<div class="box" style="width: 90%; padding: 0 5%;"> ' +
+                '<ul class="jd" style="width: 100%; height: 35px; margin: 0; padding:0;  margin-top: 28px; margin-bottom: 15px; float: left; background-color: #f1f1f1; border: 1px solid #d6d6d6; border-radius: 5px; list-style-type:none;"> ' +
+                    '<li id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgress" style="width: 0; height: 35px; background-color: #00a6a6; float: left; list-style-type:none;"></li> ' +
+                '</ul> ' +
+                '<ul class="u2" style="width: 100%; float: left; text-align: center; color: #606060;padding: 0; padding-bottom: 30px; margin: 0;"> ' +
+                    '<li class="t" id="" style="font-size: 18px; color: #00a6a6; list-style-type:none;"></li> ' +
+                    '<li style="list-style-type:none;">正在更新数据，请不要关闭或刷新页面</li> ' +
+                '</ul> ' +
+            '</div>' +
+            '</DIV>';
+
+        return html;
 
     };
 
@@ -470,19 +519,16 @@
             // 本地预览图是否返回
             if (i === 'LocalPreview'){
 
-                if (Optinos.SendType === 2){
+                if (o === true){
 
-                    if (typeof (o) === 'boolean'){
+                    if (Optinos.SendType === 2){
 
                     }else {
+
                         obj.RS = -1;
-                        obj.Msg = "参数[LocalPreview]错误：请输入正确的类型[true][false]";
+                        obj.Msg = "参数[LocalPreview]错误：本地预览功能，只在手动上传模式下开启，请设置参数[SendType]为[2]";
+
                     }
-
-                }else {
-
-                    obj.RS = -1;
-                    obj.Msg = "参数[LocalPreview]错误：本地预览功能，只在手动上传模式下开启，请设置参数[SendType]为[2]";
 
                 }
 

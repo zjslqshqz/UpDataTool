@@ -3,7 +3,12 @@
  */
 (function ($) {
 
-    //主插件对象
+
+    /**
+     * 主插件对象
+     * @param options 配置参数对象
+     * @constructor
+     */
     $.fn.UpDataTool =  function(options){
 
         var opt = $.fn.extend({},$.fn.UpDataTool.Mod_Defaults,options); // 参数覆盖
@@ -147,7 +152,13 @@
     };
 
 
-    // 数据准备
+    /**
+     * 数据准备
+     * @param Optinos 参数配置
+     * @param FileData 文件数据白 数组类型
+     * @returns {{}} 返回准备上传的数据包
+     * @constructor
+     */
     $.fn.UpDataTool.DataPost_Fun = function (Optinos,FileData) {
 
         var infoObj = {};
@@ -222,7 +233,14 @@
 
     };
 
-    // 数据提交发送
+    //
+    /**
+     * 数据提交发送
+     * @param Optinos 配置参数
+     * @param Data    准备完成的数据包
+     * @param DomData 被激活的绑定对象
+     * @constructor
+     */
     $.fn.UpDataTool.DataSend_fun = function (Optinos,Data,DomData) {
 
         // 开始
@@ -336,7 +354,13 @@
     };
 
 
-    // 数据检查提交操作
+    /**
+     * 数据检查提交操作
+     * @param Optinos 配置参数
+     * @param Data    数据包对象
+     * @param DomData 被激活的绑定对象
+     * @constructor
+     */
     $.fn.UpDataTool.LoadPost_fun = function (Optinos,Data,DomData) {
 
         // 获取对象
@@ -352,7 +376,11 @@
 
     };
 
-    // 加载条件HTML
+    /**
+     * 加载条件HTML
+     * @returns {string} HTML
+     * @constructor
+     */
     $.fn.UpDataTool.LoadProgressHTML = function () {
 
         var html  = '<Div id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML_Back" style="position: fixed; left:0; top: 0; opacity: 0.7; background-color: #fff; width: 100%; height: 100%; z-index: 9;"></Div>' +
@@ -374,7 +402,10 @@
     };
 
 
-    // 默认参数
+
+    /**
+     * 默认参数
+     */
     $.fn.UpDataTool.Mod_Defaults = {
 
         //上传模式 默认 1 ，自动上传 ， 2 ，手动触发

@@ -62,7 +62,7 @@
                     m = "multiple='true'";
                 };
                 //添加对象
-                $("body").append("<input class='"+opt.ModClassName+"' id='"+input_id+"' type='file' accept='"+opt.Accept+"' "+m+">");
+                $("body").append("<input class='"+opt.ModClassName+"' id='"+input_id+"' type='file' style='opacity: 0;position: absolute;z-index: -1;top: 0;left: 0;' accept='"+opt.Accept+"' "+m+">");
 
 
                 // 保存已经新建的文件表单ID

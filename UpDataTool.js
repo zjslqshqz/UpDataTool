@@ -454,38 +454,38 @@
         //接收到服务器响应后触发
         callback_LoadStart:function (data) {
 
-            console.log(data);
+            //console.log(data);
         },
 
         //接收响应期间持续触发
         callback_LoadProgress:function (data) {
 
 
-            console.log(data);
+            //console.log(data);
         },
 
         //文件上传完毕时，返回服务器信息
         callback_LoadComplete:function (data) {
 
-            console.log(data);
+            //console.log(data);
         },
 
         //错误信息
         callback_LoadError:function (data) {
 
-            console.log(data);
+            //console.log(data);
         },
 
         //其他
         callback_LoadCanceled:function (data) {
 
-            console.log(data);
+            //console.log(data);
         },
 
         // 本地预览图 返回
         callback_LocalPreview:function (data) {
 
-            console.log(data);
+            //console.log(data);
         }
 
 

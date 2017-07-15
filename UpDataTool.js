@@ -217,33 +217,40 @@
 
         //如果额外需要同时发送其他数据，直接使用[append(键值,对象)]方法添加数据;
         var OtherData = Optinos.event_OtherData();
-        if (!$.isPlainObject(OtherData)){
-            var obj = {};
-            obj.RS = -1;
-            obj.Msg = '[event_OtherData()]:返回内容不是obj对象';
-            Optinos.callback_Error(obj);
 
-            infoObj.Info = false;
-            return infoObj;
+        if (OtherData === false){
+            // 未设置值
         }else {
-            var e = 0;
-            var obj = {};
-            // 检查值
-            $.each(OtherData,function (i,o) {
-                if ($.isArray(o) || $.isPlainObject(o)){
-                    obj.RS = -1;
-                    obj.Msg = 'OtherData:参数数据中值不能为数组或对象类型';
-                    return false;
-                };
-            });
-            if (e !== 0){
+            if (!$.isPlainObject(OtherData)){
+                var obj = {};
+                obj.RS = -1;
+                obj.Msg = '[event_OtherData()]:返回内容不是obj对象';
                 Optinos.callback_Error(obj);
 
                 infoObj.Info = false;
                 return infoObj;
+            }else {
+                var e = 0;
+                var obj = {};
+                // 检查值
+                $.each(OtherData,function (i,o) {
+                    if ($.isArray(o) || $.isPlainObject(o)){
+                        obj.RS = -1;
+                        obj.Msg = 'OtherData:参数数据中值不能为数组或对象类型';
+                        return false;
+                    };
+                });
+                if (e !== 0){
+                    Optinos.callback_Error(obj);
+
+                    infoObj.Info = false;
+                    return infoObj;
+                };
+
             };
-            
-        };
+        }
+
+
 
         //判断是否有额外的内容
         if (!$.isEmptyObject(OtherData) && !$.isArray(OtherData)){
@@ -460,7 +467,7 @@
         //如果同时需要额外传输其他数据时，填写。{"key":0,"key":"val"}(键值,参数),不需要，则为空
         event_OtherData : function () {
 
-            //return 'OtherData';  //附加参数
+            return false;  //附加参数
         },
 
         //服务端接收路径,传输模式默认为post

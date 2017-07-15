@@ -24,6 +24,8 @@
 
 <script type="text/javascript">
 
+    var abc = {id:1};
+
     $("#open").UpDataTool({
         Accept:"application/pdf",
 
@@ -34,6 +36,12 @@
         SendType:2,
 
         Server:"server.php",
+
+        event_OtherData:function () {
+
+            return abc;
+
+        },
 
         callback_Error:function (data) {
 
@@ -72,6 +80,7 @@
 
         }
     });
+
 
 
 </script>

@@ -29,10 +29,6 @@
     $("#open").UpDataTool({
         Accept:"application/pdf",
 
-        OtherData:{
-            a:1
-        },
-
         SendType:2,
 
         Server:"server.php",

@@ -184,18 +184,16 @@
 
             };
 
-            var MB = Math.round(o.size * 100 / (1024 * 1024)) / 100;
-            var KB = Math.round(o.size * 100 / 1024) / 100;
 
             // 文件大小判断
             if (o.size > Optinos.FileSize){
 
-                if (MB > 10) {
-                    Optinos.callback_Error({RS:-1,Msg:'图片文件不能大于10MB'});
-                    // 修改状态
-                    errInfo = 1;
-                    return false;
-                };
+                var Max = Math.round((Optinos.FileSize * 100) / (1024 * 1024)) / 100;
+
+                Optinos.callback_Error({RS:-1,Msg:'图片文件不能大于'+Max+'MB'});
+                // 修改状态
+                errInfo = 1;
+                return false;
 
             };
 
@@ -482,8 +480,8 @@
         // 设置或返回指示文件传输的 MIME 类型的列表（逗号分隔）。 默认选择 图片 类型 ，如需选择其他类型，自行查找正确文件类型，传入参数即可
         Accept: 'image/png,image/jpeg',
 
-        //每个文件的大小限制,默认10mb,单位
-        FileSize:1048576,
+        //每个文件的大小限制,默认2mb,单位
+        FileSize:2097152,
 
         //通用错误信息
         callback_Error:function (data) {
@@ -615,7 +613,7 @@
 
                 }else {
                     obj.RS = -1;
-                    obj.Msg = "参数[FileSize]错误：请输入正确的类型int[1048576]";
+                    obj.Msg = "参数[FileSize]错误：请输入正确的类型int[2097152]";
                 };
             };
 

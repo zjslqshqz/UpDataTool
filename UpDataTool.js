@@ -349,8 +349,8 @@
             obj.RS = -1;
             obj.Msg = '尝试上传文件时出错';
 
-            Optinos.callback_Error(obj);
-            //Optinos.callback_LoadError(obj);
+            //Optinos.callback_Error(obj);
+            Optinos.callback_LoadError(obj);
 
         };
 

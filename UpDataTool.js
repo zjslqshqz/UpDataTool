@@ -311,6 +311,7 @@
             }
 
             $("#"+Optinos.ModClassName+"_LoadProgress").css('width',obj.PercentComplete+"%");
+            $("#"+Optinos.ModClassName+"_LoadProgressLoadText span").text(obj.PercentComplete);
 
             Optinos.callback_LoadProgress(obj);
 
@@ -423,15 +424,14 @@
      */
     $.fn.UpDataTool.LoadProgressHTML = function () {
 
-        var html  = '<Div id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML_Back" style="position: fixed; left:0; top: 0; opacity: 0.7; background-color: #fff; width: 100%; height: 100%; z-index: 9;"></Div>' +
-            '<DIV class="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadHTMLBox" id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML" style=" position: fixed; z-index: 10; top: 30%; left: 25%; width: 700px; border:2px solid #00a6a6; border-radius: 5px; background-color: #ffffff;">' +
-            '<div class="titel" style="width: 90%; padding: 0 5%; line-height: 60px; border-bottom: 1px solid #e7e7e7; font-size: 14px; color: #010101;">上传文件中 </div> ' +
+        var html  = '<Div id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML_Back" style="position: fixed; left:0; top: 0; opacity: 0.3; background-color: #000; width: 100%; height: 100%; z-index: 9;"></Div>' +
+            '<DIV class="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadHTMLBox" id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML" style=" position: fixed; z-index: 10; top: 30%; left: 25%; width: 350px; border-radius: 2px; background-color: #ffffff; box-shadow: 1px 1px 50px rgba(0,0,0,.3);-webkit-animation-fill-mode: both;animation-fill-mode: both;-webkit-animation-duration: .3s;animation-duration: .3s;-webkit-animation-name: bounceIn;animation-name: bounceIn;">' +
             '<div class="box" style="width: 90%; padding: 0 5%;"> ' +
-                '<ul class="jd" style="width: 100%; height: 35px; margin: 0; padding:0;  margin-top: 28px; margin-bottom: 15px; float: left; background-color: #f1f1f1; border: 1px solid #d6d6d6; border-radius: 5px; list-style-type:none;"> ' +
-                    '<li id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgress" style="width: 0; height: 35px; background-color: #00a6a6; float: left; list-style-type:none;"></li> ' +
+                '<ul class="jd" style="width: 100%; height: 18px; margin: 0; padding:0;  margin-top: 20px; float: left; background-color: #f1f1f1; border: 1px solid #e5e5e5; border-radius: 5px; list-style-type:none;"> ' +
+                    '<li id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgress" style="width: 0; height: 18px; background-color: #00ae43; float: left; list-style-type:none;"></li> ' +
                 '</ul> ' +
-                '<ul class="u2" style="width: 100%; float: left; text-align: center; color: #606060;padding: 0; padding-bottom: 30px; margin: 0;"> ' +
-                    '<li class="t" id="" style="font-size: 18px; color: #00a6a6; list-style-type:none;"></li> ' +
+                '<ul class="u2" style="width: 100%; float: left; text-align: center; color: #838282;padding: 0; padding-bottom: 20px; margin: 0;"> ' +
+                    '<li class="t" id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressLoadText" style="font-size: 18px; color: #333; list-style-type:none;">更新进度：<span>0</span>%</li> ' +
                     '<li style="list-style-type:none;">正在更新数据，请不要关闭或刷新页面</li> ' +
                 '</ul> ' +
             '</div>' +

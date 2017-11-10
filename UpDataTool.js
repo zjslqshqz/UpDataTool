@@ -424,7 +424,7 @@
      */
     $.fn.UpDataTool.LoadProgressHTML = function () {
 
-        var html  = '<Div id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML_Back" style="position: fixed; left:0; top: 0; opacity: 0.3; background-color: #000; width: 100%; height: 100%; z-index: 9;"></Div>' +
+        var html  = '<Div id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML_Back" style="position: fixed; left:0; top: 0; opacity: 0.3; background-color: #000; width: 100%; height: 100%; z-index: 99999999;"></Div>' +
             '<DIV class="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadHTMLBox" id="'+$.fn.UpDataTool.Mod_Defaults.ModClassName+'_LoadProgressHTML" style=" position: fixed; z-index: 10; top: 30%; left: 25%; width: 350px; border-radius: 2px; background-color: #ffffff; box-shadow: 1px 1px 50px rgba(0,0,0,.3);-webkit-animation-fill-mode: both;animation-fill-mode: both;-webkit-animation-duration: .3s;animation-duration: .3s;-webkit-animation-name: bounceIn;animation-name: bounceIn;">' +
             '<div class="box" style="width: 90%; padding: 0 5%;"> ' +
                 '<ul class="jd" style="width: 100%; height: 18px; margin: 0; padding:0;  margin-top: 20px; float: left; background-color: #f1f1f1; border: 1px solid #e5e5e5; border-radius: 5px; list-style-type:none;"> ' +

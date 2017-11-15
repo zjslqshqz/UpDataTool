@@ -217,7 +217,9 @@
         var OtherData = Optinos.event_OtherData();
 
         if (OtherData === false){
-            // 未设置值
+            // 终止上传
+            infoObj.Info = false;
+            return infoObj;
         }else {
             if (!$.isPlainObject(OtherData)){
                 var obj = {};
@@ -246,7 +248,7 @@
                 };
 
             };
-        }
+        };
 
 
 
@@ -465,9 +467,10 @@
 
         // 事件激活 检查额外数据时激活
         //如果同时需要额外传输其他数据时，填写。{"key":0,"key":"val"}(键值,参数),不需要，则为空
+        // 返回 false 终止上传动作
         event_OtherData : function () {
 
-            return false;  //附加参数
+            return {};  //附加参数
         },
 
         //服务端接收路径,传输模式默认为post
